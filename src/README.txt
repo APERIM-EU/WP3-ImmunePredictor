@@ -1,1 +1,1 @@
-All Python programs are in this folde
+All Python programs are in this folder
