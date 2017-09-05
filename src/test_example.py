@@ -4,16 +4,10 @@ import immGenPipe
 class toolParams:
 #     Change these environmental variables for the specific system you use
 #     NB! netChop does not work on OSX
-#    netChopEnv = "/tbb/local/ii/src/netchop-3.1"
-#    netChopBin = "/tbb/local/ii/src/netchop-3.1/bin/netChop"
-#    netMHCpanBin = "/tbb/local/ii/src/netMHCpan-3.0/netMHCpan"
-#    netMHCstabpanBin = "/tbb/local/ii/src/netMHCstabpan-1.0/netMHCstabpan"
-
-    netChopEnv = "/Users/ewaldvandyk/bin/netchop-3.1/Darwin_x86_64"
-    netChopBin = "/Users/ewaldvandyk/bin/netchop-3.1/Darwin_x86_64/bin/netChop"
+    netChopEnv = "/tbb/local/ii/src/netchop-3.1"
+    netChopBin = "/tbb/local/ii/src/netchop-3.1/bin/netChop"
     netMHCpanBin = "/tbb/local/ii/src/netMHCpan-3.0/netMHCpan"
     netMHCstabpanBin = "/tbb/local/ii/src/netMHCstabpan-1.0/netMHCstabpan"
-
 #     Don't change these unless you really want to change the versions, In this case, 
 #     all self proteome peptides will be re-extracted for hla alleles (time consuming)
     netChopVer = "Cterm3_0"
@@ -110,10 +104,8 @@ class outFields:
 # Specify input and output file. Input file must be a tab/comma separated file with headers for each column
 # Output file will have the same format with extra fields added 
 
-#inFile = "/home/ewald/devel/python/immuGen/APERIM_WP3_pipeline_EVD/test/neoTon_test.txt"
-#outFile = "/home/ewald/devel/python/immuGen/APERIM_WP3_pipeline_EVD/test/neoTon_out.txt"
-inFile = "/Users/ewaldvandyk/devel/python/immGen/APERIM_WP3_pipeline_EVD/test/neoTon_test.txt"
-outFile = "/Users/ewaldvandyk/devel/python/immGen/APERIM_WP3_pipeline_EVD/test/neoTon_out.txt"
+inFile = "/Users/ewaldvandyk/devel/python/immGen/APERIM_WP3_pipeline_EVD/test/neo_test.txt"
+outFile = "/Users/ewaldvandyk/devel/python/immGen/APERIM_WP3_pipeline_EVD/test/neo_test_out.txt"
 
 featStream = immGenPipe.Feats(inFile=inFile, \
                               outFile=outFile, \
