@@ -12,3 +12,7 @@ Install and test:
 3. Install NetChop, NetMHCpan and NetMHCstabpan
 4. Open "WP3-ImmunePredictor/src/test_example.py"
 5. In "test_example.py", locate the "toolParams" class and set the absolute paths for the netChop, netMHCpan and netMHCstabpan binaries. Note that netChop also requires an environment directory
+
+Usage:
+1. Run "test_example.py" to test the pipeline on an example input file from WP3-ImmunoPredictor/test/
+2. See "test_example.py" for usage instructions
