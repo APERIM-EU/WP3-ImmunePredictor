@@ -217,7 +217,7 @@ class Peptide:
                 proc.wait()
 
         dataDict = netchop_raw_file_2_Dict(tempChopTxtOut, [tempProt])
-        raise IOError
+        #raise IOError
         shutil.rmtree(tempDir, ignore_errors=False)
 
         return dataDict[tempProt]
