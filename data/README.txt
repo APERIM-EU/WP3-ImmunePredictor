@@ -9,4 +9,4 @@ First time useage:
 
 All subsequent runs:
 The data folder will naturally grow in size as more 'unseen' HLA alleles are processed in the pipeline
-For a new 'unseen' HLA allele, predicting self similarity scores will be slow, since the peptidome needs to be predicted from the whole human thymus proteome. The newly extracted peptidome will be stored in this data folder, which makes subesquent runs fast.
+For a new 'unseen' HLA allele, predicting self similarity scores will be slow (10 hours per allele on regular computer), since the peptidome needs to be predicted from the whole human thymus proteome. The newly extracted peptidome will be stored in this data folder, which makes subesquent runs fast.
