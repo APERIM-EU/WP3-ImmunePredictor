@@ -1,4 +1,7 @@
 data/*
 !data/README.txt
+test/*
+!test/neo_test.txt
 .project
 .pydevproject
+*.pyc

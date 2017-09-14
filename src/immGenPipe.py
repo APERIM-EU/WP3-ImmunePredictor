@@ -238,7 +238,6 @@ class Feats:
                                                 version         = self._toolParams.netChopVer, \
                                                 proteomeName    = self._netChopParams.ref_proteome, \
                                                 tieBreak        = self._netChopParams.tie_break)
-            
             refSelfPep_field    = "%s_refSelf_pep"%(self._toolParams.netChopVer)
             refSelfScore_field  = "%s_refSelf_score"%(self._toolParams.netChopVer)
             AntigenScore_field  = "%s_antigen_score"%(self._toolParams.netChopVer)

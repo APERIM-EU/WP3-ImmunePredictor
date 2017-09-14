@@ -8,6 +8,7 @@ import numpy
 import warnings
 import datetime
 
+
 class Struct:
     def __init__(self):
         pass 
@@ -26,8 +27,8 @@ class Proteome:
             classDir = os.path.dirname(classFileName)
             dataDir = os.path.abspath(os.path.join(classDir, '..', '..', Proteome.dataSubDir))
         
-        self._netchopEnv = netchopEnv
-        self._binName = binName
+        self.set_netChop_env(netchopEnv)
+        self.set_netChop_bin_name(binName)
         self._version  = version
         self._dataDir = dataDir
         self._setup_prot(protName)
@@ -62,27 +63,28 @@ class Proteome:
         curr_time = datetime.datetime.now();
         curr_time_str = curr_time.strftime("%Y_%m_%d_%H_%M_%S_%f")
         tempDir = os.path.join(self._chopDataDir, "%s_temp_%s"%(self._protName, curr_time_str))
-        tempChopTxt = os.path.join(self._chopDataDir, "%s_temp_%s.txt"%(self._protName, curr_time_str))
+        tempChopTxt = os.path.join(tempDir, "%s_temp_netChopFinal.txt"%(self._protName))
         
         if not os.path.isdir(tempDir):
             os.mkdir(tempDir)    
-        
-        if not os.path.isfile(tempChopTxt):
-            args = [self._binName, '-tdir', tempDir, self._protFastaFile]
-            my_env = os.environ.copy()
-            my_env["NETCHOP"] = self._netchopEnv
-            with open(tempChopTxt, "wb") as f:
-                proc = subprocess.Popen(args, env=my_env, stdout=f)
-                proc.wait()
-
-        protIDs = self._get_prot_keys_from_fasta()
-        dataDict = netchop_raw_file_2_Dict(tempChopTxt, protIDs)
-        
-        outStream = io_evd.zipbin.Stream(self._chopDataFile)
-        outStream.write(dataDict)
-        
+        try:
+            if not os.path.isfile(tempChopTxt):
+                args = [self._binName, '-tdir', tempDir, self._protFastaFile]
+                my_env = os.environ.copy()
+                my_env["NETCHOP"] = self._netchopEnv
+                with open(tempChopTxt, "wb") as f:
+                    proc = subprocess.Popen(args, env=my_env, stdout=f)
+                    proc.wait()
+    
+            protIDs = self._get_prot_keys_from_fasta()
+            dataDict = netchop_raw_file_2_Dict(tempChopTxt, protIDs)
+            
+            outStream = io_evd.zipbin.Stream(self._chopDataFile)
+            outStream.write(dataDict)
+        except:
+            shutil.rmtree(tempDir, ignore_errors=False)
+            raise IOError("Unable to execute netChop properly")
         shutil.rmtree(tempDir, ignore_errors=False)
-        os.remove(tempChopTxt)
 
         return dataDict
         
@@ -112,6 +114,20 @@ class Proteome:
                     geneEnd = line.find("PE=")
                     geneIDs.append(line[geneStart:geneEnd].strip())
         return protSeqIDs, geneIDs   
+    
+    def set_netChop_env(self, netchopEnv=None):
+        if not os.path.isdir(netchopEnv):
+            self._netchopEnv = None
+            raise IOError("netChop environment directory not accessible")
+        else:
+            self._netchopEnv = netchopEnv
+            
+    def set_netChop_bin_name(self, binName):
+        if not os.path.isfile(binName):
+            self._binName = None
+            raise IOError("netChop bin file not accessible")
+        else:
+            self._binName = binName
     
     def convert_oldDat_2_newDat(self, outFile):  
         if not os.path.isfile(self._chopDataFile):
@@ -162,8 +178,8 @@ class Peptide:
             classDir = os.path.dirname(classFileName)
             dataDir = os.path.abspath(os.path.join(classDir, '..', '..', Peptide.dataSubDir))
         
-        self._netchopEnv = netchopEnv
-        self._binName = binName
+        self.set_netChop_env(netchopEnv)
+        self.set_netChop_bin_name(binName)
         self._version  = version
         self._dataDir = dataDir
         self._tieBreak = tieBreak
@@ -177,9 +193,12 @@ class Peptide:
         self._proteomeLoaded = False
         self._protFastaDir = os.path.join(self._dataDir, Peptide.protFastaSubDir)
         self._protFastaFile = os.path.join(self._protFastaDir, "%s.fasta"%(proteomeName))
+        self._chopDataDir = os.path.join(self._dataDir, self._version)
+        if not os.path.isdir(self._chopDataDir):
+            os.mkdir(self._chopDataDir)
         curr_time = datetime.datetime.now();
         curr_time_str = curr_time.strftime("%Y_%m_%d_%H_%M_%S_%f")
-        self._netChopTemp = os.path.join(self._protFastaDir, "%s_netchop_evd_temp_%s"%(proteomeName, curr_time_str))
+        self._netChopTemp = os.path.join(self._chopDataDir, "%s_netchop_evd_temp_%s"%(proteomeName, curr_time_str))
         
     def _load_proteome(self):
         if not self._proteomeLoaded:
@@ -195,28 +214,32 @@ class Peptide:
         tempChopTxtOut = os.path.join(tempDir, "%evd_temp_out.txt")
         tempProt = "Test prot"
         
-        if not os.path.isdir(tempDir):
-            os.mkdir(tempDir) 
+        try:
+            if not os.path.isdir(tempDir):
+                os.mkdir(tempDir) 
+                
+            with open(tempChopTxtIn, "wb") as f:
+                f.write(">%s\n%s"%(tempProt, ext_pep))   
             
-        with open(tempChopTxtIn, "wb") as f:
-            f.write(">%s\n%s"%(tempProt, ext_pep))   
-        
-        if not os.path.isfile(tempChopTxtOut):
-            args = [self._binName, '-tdir', tempDir, tempChopTxtIn]
-#             args = [self._binName, tempChopTxtIn]
-            my_env = os.environ.copy()
-            my_env["NETCHOP"] = self._netchopEnv
-#             my_env["TMPDIR"] = tempDir
-#             my_env["UNIX"] = "Darwin"
-#             my_env["AR"] = "x86_64"
-#             my_env["NMHOME"] = "/Users/ewaldvandyk/bin/netchop-3.1"
-#             my_env["PWD"] = os.getcwd()
-#             print my_env["PWD"]
-            with open(tempChopTxtOut, "wb") as f:
-                proc = subprocess.Popen(args, env=my_env, stdout=f)
-                proc.wait()
-
-        dataDict = netchop_raw_file_2_Dict(tempChopTxtOut, [tempProt])
+            if not os.path.isfile(tempChopTxtOut):
+                args = [self._binName, '-tdir', tempDir, tempChopTxtIn]
+    #             args = [self._binName, tempChopTxtIn]
+                my_env = os.environ.copy()
+                my_env["NETCHOP"] = self._netchopEnv
+    #             my_env["TMPDIR"] = tempDir
+    #             my_env["UNIX"] = "Darwin"
+    #             my_env["AR"] = "x86_64"
+    #             my_env["NMHOME"] = "/Users/ewaldvandyk/bin/netchop-3.1"
+    #             my_env["PWD"] = os.getcwd()
+    #             print my_env["PWD"]
+                with open(tempChopTxtOut, "wb") as f:
+                    proc = subprocess.Popen(args, env=my_env, stdout=f)
+                    proc.wait()
+    
+            dataDict = netchop_raw_file_2_Dict(tempChopTxtOut, [tempProt])
+        except:
+            shutil.rmtree(tempDir, ignore_errors=False)
+            raise IOError("Unable to execute netChop properly")
         #raise IOError
         shutil.rmtree(tempDir, ignore_errors=False)
 
@@ -247,6 +270,20 @@ class Peptide:
                 reduced_proteome[protKey] = self._proteomeDict[protKey][seqStart:seqEnd]
         return reduced_proteome
     
+    def set_netChop_env(self, netchopEnv=None):
+        if not os.path.isdir(netchopEnv):
+            self._netchopEnv = None
+            raise IOError("netChop environment directory not accessible")
+        else:
+            self._netchopEnv = netchopEnv
+            
+    def set_netChop_bin_name(self, binName):
+        if not os.path.isfile(binName):
+            self._binName = None
+            raise IOError("netChop bin file not accessible")
+        else:
+            self._binName = binName
+            
     def get_score(self, \
                   test_pep      = None, \
                   germ_pep      = None, \
