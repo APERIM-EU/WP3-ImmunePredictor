@@ -134,7 +134,8 @@ class Feats:
     def _get_inFieldValues(self, element):
         inParams = inFields_default()
         if not self._inField_index["mhc_Name"] == None:
-            inParams.mhcName = element[self._inField_index["mhc_Name"]]
+            MHC_element = element[self._inField_index["mhc_Name"]]
+            inParams.mhcName = supported_MHC_name_format(MHC_element)
         if not self._inField_index["test_pep"] == None:
             inParams.test_pep = element[self._inField_index["test_pep"]]
         if not self._inField_index["ext_pep"] == None:
@@ -331,3 +332,31 @@ class Feats:
         else:
             return False 
         
+def supported_MHC_name_format(mhc_string):
+    errorStr = "MHC allele \"%s\" not recognized"%mhc_string
+    if not "HLA" in mhc_string:
+        raise IOError(errorStr)
+    mhc_parts = mhc_string.split("HLA")
+    if not len(mhc_parts) == 2:
+        raise IOError(errorStr)
+    if not not mhc_parts[0]:
+        raise IOError(errorStr)
+    mhc_part = mhc_parts[1]
+    alphaLetters = ''.join(x for x in mhc_part if x.isalpha())
+    if not alphaLetters in mhc_part:
+        raise IOError(errorStr)
+    mhc_parts = mhc_part.split(alphaLetters)
+    if not len(mhc_parts) == 2:
+        raise IOError(errorStr)
+    mhc_part = mhc_parts[1]
+    mhc_parts = mhc_part.split(':')
+ 
+    if not len(mhc_parts) == 2:
+        raise IOError(errorStr)
+    digits1 = ''.join(x for x in mhc_parts[0] if x.isdigit())
+    digits2 = ''.join(x for x in mhc_parts[1] if x.isdigit())
+    if not digits1 or not digits2:
+        raise IOError(errorStr)
+    compatible_MHC_string = 'HLA-%s%s:%s'%(alphaLetters, digits1, digits2)
+    
+    return compatible_MHC_string
