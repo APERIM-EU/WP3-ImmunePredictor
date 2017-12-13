@@ -1,3 +1,4 @@
+import os
 import immGenPipe
 
 # In toolParams you specify all the environmental variables required for netChop, netMHCpan and netMHCstabpan 
@@ -8,6 +9,12 @@ class toolParams:
     netChopBin = "/tbb/local/ii/src/netchop-3.1/bin/netChop"
     netMHCpanBin = "/tbb/local/ii/src/netMHCpan-3.0/netMHCpan"
     netMHCstabpanBin = "/tbb/local/ii/src/netMHCstabpan-1.0/netMHCstabpan"
+    
+#     netChopEnv = "/Users/ewaldvandyk/bin/netchop-3.1"
+#     netChopBin = "/Users/ewaldvandyk/bin/netchop-3.1/netChop"
+#     netMHCpanBin = "/Users/ewaldvandyk/bin/netMHCpan-3.0/netMHCpan"
+#     netMHCstabpanBin = "/Users/ewaldvandyk/bin/netMHCstabpan-1.0/netMHCstabpan"
+
 #     Don't change these unless you really want to change the versions, In this case, 
 #     all self proteome peptides will be re-extracted for hla alleles (time consuming)
     netChopVer = "Cterm3_0"
@@ -97,15 +104,18 @@ class outFields:
     netChop         = True
     netMHCpan       = True
     netMHCstabpan   = True
-    calisImmGen     = False
-    calisSelf       = False
+    calisImmGen     = True
+    calisSelf       = True
     
     
 # Specify input and output file. Input file must be a tab/comma separated file with headers for each column
 # Output file will have the same format with extra fields added 
 
-inFile = "/Users/ewaldvandyk/devel/python/immGen/APERIM_WP3_pipeline_EVD/test/neo_test.txt"
-outFile = "/Users/ewaldvandyk/devel/python/immGen/APERIM_WP3_pipeline_EVD/test/neo_test_out.txt"
+script_path = os.path.dirname(os.path.realpath(__file__))
+test_path = os.path.abspath(os.path.join(script_path, "..", "test"))
+inFile  = os.path.join(test_path, "neo_test.txt")
+outFile = os.path.join(test_path, "neo_test_out.txt") 
+
 
 featStream = immGenPipe.Feats(inFile=inFile, \
                               outFile=outFile, \
@@ -114,4 +124,6 @@ featStream = immGenPipe.Feats(inFile=inFile, \
                               toolParams=toolParams, \
                               netChopParams=netChopParams, \
                               selfSimParams=selfSimParams)
+
+
 featStream.add()
