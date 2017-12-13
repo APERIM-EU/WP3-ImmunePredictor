@@ -295,10 +295,13 @@ class Peptide:
         if not ext_pep == None:
             if not test_pep in ext_pep:
                 raise ValueError("test_pep is not a substring of ext_pep")
-            pepStart = ext_pep.index(test_pep)
-            pepEnd = pepStart+pepLen-1 
-            chopScores = self._get_ext_pep_chop_scores(ext_pep)
-            return (None, None, "%f"%chopScores[pepEnd])
+            pep_i = ext_pep.index(test_pep)
+            pepExtStart = max(pep_i - 8, 0)
+            pepExtEnd   = min(pep_i + pepLen + 8, len(ext_pep))
+            pepStart = pep_i - pepExtStart
+            pepLastI = pepStart+pepLen-1 
+            chopScores = self._get_ext_pep_chop_scores(ext_pep[pepExtStart:pepExtEnd])
+            return (None, None, "%f"%chopScores[pepLastI])
         self._load_proteome()
         protSubSet = self._get_prot_subset_keys(pep_protName)
         if not protSubSet:
